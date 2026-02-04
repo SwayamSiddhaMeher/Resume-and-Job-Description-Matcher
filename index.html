@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MatchPro - Resume & Job Matcher</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="firebaseConfig.js"></script>
+</head>
+<body>
+  <header class="header">
+    <h1>MatchPro</h1>
+    <nav class="nav">
+      <a href="#features">Features</a>
+      <a href="#about">About</a>
+      <a id="nav-login" href="login.html" class="cta-button primary-cta">Log In</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-content">
+        <h2>🎯 The Ultimate Job & Talent Matchmaker</h2>
+        <p>Use AI to align resumes and job descriptions — faster, fairer hiring.</p>
+        <a id="get-started-cta" href="#" class="cta-button hero-cta">Get Started for Free</a>
+      </div>
+    </section>
+
+    <section id="features" class="persona-section">
+      <div class="persona-card professional">
+        <h3>🧑‍💼 For Job Seekers</h3>
+        <ul>
+          <li>Get an ATS Match Score against any job description</li>
+          <li>Identify missing keywords and skills</li>
+          <li>Receive actionable suggestions to optimize your resume</li>
+        </ul>
+        <a href="login.html?role=professional" class="cta-button card-cta primary-cta">Start Matching</a>
+      </div>
+
+      <div class="persona-card recruiter">
+        <h3>👩‍💼 For Recruiters</h3>
+        <ul>
+          <li>Batch-screen resumes and get ranked results</li>
+          <li>Identify missing skills and shortlist quickly</li>
+        </ul>
+        <a href="login.html?role=recruiter" class="cta-button card-cta secondary-cta">Find Talent</a>
+      </div>
+    </section>
+
+    <section id="about" class="about-section">
+      <h3>Why Choose MatchPro?</h3>
+      <p>We combine keyword gap analysis with semantic similarity to provide clear, actionable alignment scores.</p>
+    </section>
+  </main>
+
+  <footer class="footer">&copy; 2025 MatchPro</footer>
+
+  <script>
+    // index redirect: uses firebase initialized in firebaseConfig.js
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    document.getElementById('get-started-cta').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const user = auth.currentUser;
+      if (!user) return window.location.href = 'login.html?role=professional';
+      await user.reload();
+      if (!user.emailVerified) return window.location.href = 'login.html';
+      const doc = await db.collection("users").doc(user.uid).get();
+      const role = doc.data()?.role;
+      if (role === 'professional') window.location.href = 'professional-dashboard.html';
+      else if (role === 'recruiter') window.location.href = 'recruiter-dashboard.html';
+      else window.location.href = 'login.html';
+    });
+  </script>
+</body>
+</html>
